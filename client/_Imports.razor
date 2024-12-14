@@ -1,0 +1,73 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using BaseLibrary.Entities
+@using client.ApplicationStates
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.JSInterop
+@using client
+@using client.Layout
+
+@using BaseLibrary.DTOs
+@using ClientLibrary.Helpers
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components 
+@using ClientLibrary.Services.contract
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Licensing
+
+
+
+
+
+@using client.Pages.Other_Pages
+@using client.Pages.Other_Pages.Doctor_page
+@using client.Pages.Content_Pages.DepartmentPages
+@using client.Pages.Content_Pages.LocationPages
+@using client.Pages.Content_Pages.UserPage
+@using client.Pages.Content_Pages.EmployeePages
+
+
+
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavManager
+
+@inject SfDialogService dialogService
+
+@* Navbar tabs communication sate handling*@
+@inject AllState allState
+
+@* /Authentiction*@
+@inject IuserAccountService accountService
+
+@* /GD / Deparmtent / branch*@
+@inject IGenericImplementation<GeneralDepartment> generalDepartmentService
+@inject IGenericImplementation<Department> departmentService
+@inject IGenericImplementation<Branch> branchService
+@*/country / city /town*@
+@inject IGenericImplementation<Country> countryService
+@inject IGenericImplementation<City> cityService
+@inject IGenericImplementation<Town> townService
+@*Employee*@
+@inject IGenericImplementation<Employee> employeeService
+
+@inject IGenericImplementation<Overtime> overtimeService
+@inject IGenericImplementation<OverTimeType> overtimeTypeService
+@inject IGenericImplementation<Sanction> sanctionService
+@inject IGenericImplementation<SanctionType> sanctionTypeService
+@inject IGenericImplementation<Vacation> vacationService
+@inject IGenericImplementation<VacationType> vacationTypeService
+@*Employee*@
+@inject IGenericImplementation<Doctor> doctorService
+
+
+
+
+
+

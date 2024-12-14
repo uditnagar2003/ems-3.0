@@ -1,0 +1,169 @@
+﻿    @using client.ApplicationStates
+@*using BaseLibrary.Entities
+@using client.ApplicationStates*@
+    @implements IDisposable
+@*inject SystemRoleState countryState*@
+@if (allState.ShowUser)
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">ManageUsers</h4>
+                        @*<button class="btn btn-outline-success float-end" @onclick="AddButtonClicked">
+                            <i class="bi bi-plus-circle-dotted"></i>
+                            Add ManageUsers
+                    </button>*@
+                    </div>
+                    <div class="card-header" style="max-height:500px; overflow:hidden; overflow-y:scroll;">
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Role</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ManageUsers != null)
+                                    {
+                                       int count = 1;
+                                        foreach (var item in ManageUsers)
+                                        {
+                                            <tr>
+                                                <th scope="row">@count</th>
+                                                <td>@item.UserId</td>
+                                                <td>@item.Name</td>
+                                                <td>@item.Email</td>
+                                                <td>@item.Role</td>
+                                                <td>
+                                                    <i class="bi bi-pencil text-info" id="cursorStyle"
+                                                       @onclick="()=>EditClicked(item)"></i>
+                                                    <i class="bi bi-trash text-danger" id="cursorStyle"
+                                                       @onclick="()=>DeleteClicked(item)"></i>
+
+                                                </td>
+                                            </tr>
+                                            count++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4"><div class="alert alert-info text-center">No ManageUsers Added Yet!</div></td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+}
+<UserDialog @ref="userDialog"
+            HandleSaveOperationEvents="HandleSaveOperationEvent"
+            ManageUsers="ManageUser"
+            SystemRoles="SystemRoles" />
+
+
+
+<style>
+    .cursorStyle {
+        cursor: pointer;
+    }
+</style>
+@code
+{
+    UserDialog? userDialog;
+    ManageUsers ManageUser = new();
+    public string Title { get; set; } = "Add";
+    public List<ManageUsers> ManageUsers { get; set; } = new();
+
+    public List<SystemRole> SystemRoles { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetRoles();
+        await GetUsers();
+
+        allState.Action += StateHasChanged;
+    }
+    private async Task GetRoles()
+    {
+        SystemRoles = await accountService.GetRoles();
+    }
+    private async Task GetUsers()
+    {
+        ManageUsers = await accountService.GetUsers();
+    }
+    void OpenDialog()
+    {
+        userDialog?.OpenDialog();
+    }
+    @*async Task AddButtonClicked()
+    {
+        ManageUsers = new();
+        //await GetSystemRoles();
+        OpenDialog();
+    }*@
+    private async Task HandleSaveOperationEvent(ManageUsers manageUsers)
+    {
+        var result = await accountService.UpdateUser(manageUsers);
+        bool successCheck = await DisplayMessage(result.Flag,result.Message);
+        if (successCheck)
+        {
+            ManageUsers = new();
+            await GetUsers();
+            
+        }
+
+    }
+    private async Task<bool> DisplayMessage(bool flag, string message)
+    {
+        if (flag)
+        {
+            await dialogService.AlertAsync(message, "Success Operation");
+            return true;
+        }
+        else
+        {
+            await dialogService.AlertAsync(message, "Alert some error");
+            return false;
+
+
+        }
+    }
+    private async Task EditClicked(ManageUsers dep)
+    {
+        ManageUser = dep;
+        OpenDialog();
+    }
+    private async void DeleteClicked(ManageUsers dep)
+    {
+        bool confirm = await dialogService.ConfirmAsync($"Do you want to delete {dep.Name}", "Confirm Delete");
+        if (!confirm) return;
+        var response = await accountService.DeleteUser(dep.UserId);
+        var result = await DisplayMessage(response.Flag, response.Message);
+        if (response.Flag)
+        {
+            await GetUsers();
+            StateHasChanged();
+
+        }
+
+
+    }
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+}
+

@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.5" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="Syncfusion.Blazor.Buttons" Version="27.1.55" />
+    <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="27.1.55" />
+    <PackageReference Include="Syncfusion.Blazor.Grid" Version="27.1.55" />
+    <PackageReference Include="Syncfusion.Blazor.Popups" Version="27.1.55" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="27.1.55" />
+    <PackageReference Include="Syncfusion.Licensing" Version="27.1.55" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BaseLibrary\BaseLibrary.csproj" />
+    <ProjectReference Include="..\ClientLibrary\ClientLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\Account Pages\registerpage.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\Account Pages\registerpage.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pages\Other_Pages\OvertimePage\" />
+    <Folder Include="Pages\Other_Pages\SanctionPage\" />
+    <Folder Include="Pages\Other_Pages\VacationPage\" />
+    <Folder Include="wwwroot\images\profile\" />
+  </ItemGroup>
+
+</Project>

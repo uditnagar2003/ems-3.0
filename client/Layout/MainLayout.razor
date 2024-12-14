@@ -1,0 +1,39 @@
+﻿@inherits LayoutComponentBase
+@using BaseLibrary.DTOs;
+@using Microsoft.AspNetCore.Authorization
+@using ClientLibrary.Helpers;
+@inject AuthenticationStateProvider AuthStateProvider 
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize]
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+          <client.Pages.Other_Pages.ProfileDropDown></client.Pages.Other_Pages.ProfileDropDown>
+            
+           
+        </div>
+
+        <article class="content px-4">
+            @Body
+            <Syncfusion.Blazor.Popups.SfDialogProvider />
+        </article>
+    </main>
+</div>
+
+
+@code{
+
+    async Task LogoutClicked()
+    {
+        var logoutModel = new UserSession();
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(logoutModel);
+        NavManager.NavigateTo("/identity/account/login", forceLoad: true);
+
+
+    }
+}

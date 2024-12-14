@@ -1,0 +1,31 @@
+﻿@page "/home/dashboard"
+@layout MainLayout
+<TableBanner />
+<GeneralDepartmentPage/>
+<DepartmentPage/>
+<BranchPages/>
+<CountryPage/>
+<CityPage/>
+<TownPage/>
+<UserPage/>
+<EmployeePage/>
+
+@code {
+   [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+    protected async override Task OnInitializedAsync()
+    {
+        Console.WriteLine("this home page on initialize");
+        await CheckUserAuthentication();
+    }
+    private async Task CheckUserAuthentication()
+    {
+        var user = (await AuthenticationState).User;
+
+        bool isUserAuthenticated = user.Identity!.IsAuthenticated;
+        Console.WriteLine("this home page on user authentication" + isUserAuthenticated);
+
+        if (!isUserAuthenticated)
+            NavManager.NavigateTo("/identity/account/login");
+    }
+   
+}

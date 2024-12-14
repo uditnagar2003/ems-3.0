@@ -1,0 +1,79 @@
+﻿@using Syncfusion.Blazor.Buttons;
+<SfDialog Width="200px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
+    <DialogEvents OnOpen="OpenDialog"></DialogEvents>
+    <DialogTemplates>
+        <Header> @Title Town </Header>
+        <Content>
+            <EditForm Model="Town" OnSubmit="Save">
+                <div class="card border-success">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Id</label>
+                            <input @bind="Town.id" class="form-control" disabled />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <InputText @bind-Value="Town.name" class="form-control" />
+                        </div>
+                        <div class="form-group ">
+                            <label class="form-label">Select City</label>
+                            @if (Town.City is not null)
+                            {
+                                string selected = Town.City.name!;
+                                <SfDropDownList TValue="string" TItem="City" Placeholder="@selected" DataSource="Cities">
+                                    <DropDownListFieldSettings Value="id" Text="name"></DropDownListFieldSettings>
+                                    <DropDownListEvents TValue="string" TItem="City" ValueChange="OnValueChange"></DropDownListEvents>
+
+                                </SfDropDownList>
+                            }
+                            else
+                            {
+                                <SfDropDownList TValue="string" TItem="City" Placeholder="select City" DataSource="Cities">
+                                    <DropDownListFieldSettings Value="id" Text="name"></DropDownListFieldSettings>
+                                    <DropDownListEvents TValue="string" TItem="City" ValueChange="OnValueChange"></DropDownListEvents>
+
+                                </SfDropDownList>
+                            }
+
+                            @*<InputText @bind-Value="GeneralDepartment1.name" class="form-control" />*@
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton Content="SAVE" Type="ButtonType.Submit" IsPrimary="true" OnClick="Save" />
+    </DialogButtons>
+</SfDialog>
+
+
+@code {
+    [Parameter] public Town Town { get; set; } = new();
+    [Parameter] public List<City> Cities { get; set; } = new();
+    [Parameter] public EventCallback<Town> HandleSaveOperationEvents { get; set; }
+    private bool IsVisible { get; set; } = false;
+    public string Title { get; set; } = "Add";
+    public void OpenDialog()
+    {
+        IsVisible = true;
+        StateHasChanged();
+    }
+    async void Save()
+    {
+
+        if (string.IsNullOrEmpty(Town.name) || Town.CityId <= 0)
+            await dialogService.AlertAsync("You need to enter department name", "Alert!!!!");
+        else
+            await HandleSaveOperationEvents.InvokeAsync(Town);
+    }
+    public void ChangeTitle(string title)
+    {
+        Title = title;
+    }
+    public void OnValueChange(ChangeEventArgs<string, City> args)
+    {
+        Town.CityId = int.Parse(args.Value);
+    }
+
+}

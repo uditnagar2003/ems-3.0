@@ -1,0 +1,177 @@
+﻿    @using client.ApplicationStates
+@*using BaseLibrary.Entities
+@using client.ApplicationStates*@
+    @implements IDisposable
+@*inject CityState cityState*@
+@if (allState.ShowTown)
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">Town</h4>
+                        <button class="btn btn-outline-success float-end" @onclick="AddButtonClicked">
+                            <i class="bi bi-plus-circle-dotted"></i>
+                            Add Town
+                        </button>
+                    </div>
+                    <div class="card-header" style="max-height:500px; overflow:hidden; overflow-y:scroll;">
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">City</th>
+                                        <th scope="col">Town</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Towns is not null)
+                                    {
+                                        int count = 1;
+                                        foreach (var item in Towns)
+                                        {
+                                            <tr>
+                                                <th scope="row">@count</th>
+                                                <td>@item.id</td>
+                                                <td>@item.City!.name</td>
+                                                <td>@item.name</td>
+                                                <td>
+                                                    <i class="bi bi-pencil text-info" id="cursorStyle"
+                                                       @onclick="()=>EditClicked(item)"></i>
+                                                    <i class="bi bi-trash text-danger" id="cursorStyle"
+                                                       @onclick="()=>DeleteClicked(item)"></i>
+
+                                                </td>
+                                            </tr>
+                                            count++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4"><div class="alert alert-info text-center">No Town Added Yet!</div></td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <TownDialog @ref="townDialog"
+                HandleSaveOperationEvents="HandleSaveOperationEvent"
+                Town="Town"
+                Cities="Cities" />
+
+
+
+    <style>
+        .cursorStyle {
+            cursor: pointer;
+        }
+    </style>
+}
+@code
+{
+    TownDialog? townDialog;
+    Town Town = new();
+    public string Title { get; set; } = "Add";
+    public List<Town> Towns { get; set; } = new();
+
+    public List<City> Cities { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCities();
+        await GetTowns();
+        allState.Action += StateHasChanged;
+    }
+    private async Task GetCities()
+    {
+        Cities = await cityService.GetAll(Constants1.CityBaseUrl);
+    }
+    private async Task GetTowns()
+    {
+        Towns = await townService.GetAll(Constants1.TownBaseUrl);
+    }
+    void OpenDialog()
+    {
+        townDialog?.OpenDialog();
+    }
+    async Task AddButtonClicked()
+    {
+        townDialog?.ChangeTitle("Add");
+        Town = new();
+        await GetCities();
+        OpenDialog();
+    }
+    private async Task HandleSaveOperationEvent()
+    {
+        bool successCheck = false;
+        if (Town.id > 0)
+        {
+            var result = await townService.Update(Town, Constants1.TownBaseUrl);
+            successCheck = await DisplayMessage(result.Flag, result.Message);
+        }
+        else
+        {
+            var response = await townService.Insert(Town, Constants1.TownBaseUrl);
+            successCheck = await DisplayMessage(response.Flag, response.Message);
+        }
+        if (successCheck)
+        {
+            Town = new();
+            await GetTowns();
+            townDialog?.ChangeTitle("Add");
+        }
+
+    }
+    private async Task<bool> DisplayMessage(bool flag, string message)
+    {
+        if (flag)
+        {
+            await dialogService.AlertAsync(message, "Success Operation");
+            return true;
+        }
+        else
+        {
+            await dialogService.AlertAsync(message, "Alert some error");
+            return false;
+
+
+        }
+    }
+    private async Task EditClicked(Town dep)
+    {
+        townDialog?.ChangeTitle("Update");
+        Town = dep;
+        await GetCities();
+        OpenDialog();
+    }
+    private async void DeleteClicked(Town dep)
+    {
+        bool confirm = await dialogService.ConfirmAsync($"Do you want to delete {dep.name}", "Confirm Delete");
+        if (!confirm) return;
+        var response = await townService.DeleteById(dep.id, Constants1.TownBaseUrl);
+        var result = await DisplayMessage(response.Flag, response.Message);
+        if (response.Flag)
+        {
+            await GetTowns();
+            StateHasChanged();
+
+        }
+
+
+    }
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+}
+
